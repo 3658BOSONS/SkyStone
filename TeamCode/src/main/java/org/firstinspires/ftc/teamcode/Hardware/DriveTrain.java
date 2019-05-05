@@ -10,32 +10,29 @@ public class DriveTrain
     private DcMotor br;
     private DcMotor bl;
 
-    private Gyro gyro;
     private int fieldOriented;
 
-    public DriveTrain(DcMotor fl, DcMotor fr, DcMotor br, DcMotor bl, Gyro gyro)
+    public DriveTrain(DcMotor fl, DcMotor fr, DcMotor br, DcMotor bl)
     {
         this.fl = fl;
         this.fr = fr;
         this.br = br;
         this.bl = bl;
 
-        this.gyro = gyro;
-
         fl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         fr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         br.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         bl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        fl.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        fr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        br.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        bl.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        fl.setDirection(DcMotor.Direction.FORWARD);
-        bl.setDirection(DcMotor.Direction.FORWARD);
-        fr.setDirection(DcMotor.Direction.REVERSE);
-        br.setDirection(DcMotor.Direction.REVERSE);
+        fl.setDirection(DcMotor.Direction.REVERSE);
+        bl.setDirection(DcMotor.Direction.REVERSE);
+        fr.setDirection(DcMotor.Direction.FORWARD);
+        br.setDirection(DcMotor.Direction.FORWARD);
 
         fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -48,28 +45,28 @@ public class DriveTrain
     //Turn is the amount of turn with the strafe.  -1 will be full power counterclockwise, 1 will be full power clockwise.
     public void move(double direction, double power, double turn)
     {
-
-        direction += gyro.getAngle() * fieldOriented;
-
         //Convert from polar to cartesian
-        double x = Math.cos(Math.toRadians(direction)) * power;
-        double y = Math.sin(Math.toRadians(direction)) * power;
+        double x = Math.cos(direction) * power;
+        double y = Math.sin(direction) * power;
 
         //Calculate the wheel powers
-        double fl_power = y + x - turn;
-        double fr_power = y - x + turn;
-        double br_power = y + x + turn;
-        double bl_power = y - x - turn;
+        double fl_power = y - x*1.5 + turn;
+        double fr_power = y + x*1.5 - turn;
+        double br_power = y - x*1.5 - turn;
+        double bl_power = y + x*1.5 + turn;
 
         //Turn put the values outside the range of -1 to 1, put them back
 
         //Find max
-        double max = Math.max(fl_power, fr_power);
-        max = Math.max(max, br_power);
-        max = Math.max(max, bl_power);
+        double max = Math.max(Math.abs(fl_power), Math.abs(fr_power));
+        max = Math.max(max, Math.abs(br_power));
+        max = Math.max(max, Math.abs(bl_power));
 
         //Find scale
-        double scale = 1.0 / max;
+        double scale = 1.0;
+        if(max > 1.0){
+            scale = Math.abs(1.0 / max);
+        }
 
         //Scale
         fl_power *= scale;
@@ -82,11 +79,6 @@ public class DriveTrain
         fr.setPower(fr_power);
         bl.setPower(bl_power);
         br.setPower(br_power);
-    }
-
-    public void setFieldOriented(boolean fieldOriented)
-    {
-        this.fieldOriented = fieldOriented ? 1 : 0;
     }
 
 }
