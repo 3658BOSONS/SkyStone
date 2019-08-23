@@ -1,43 +1,35 @@
 package org.firstinspires.ftc.teamcode.Hardware;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 public class DriveTrain
 {
 
-    private DcMotor fl;
-    private DcMotor fr;
-    private DcMotor br;
-    private DcMotor bl;
+    private Motor fl;
+    private Motor fr;
+    private Motor br;
+    private Motor bl;
 
     private int fieldOriented;
+    public static final double wheelWidth = 15.5;
+    public static final int CPR = 28;
+    public static final int wheelSize = 4;
+    public static final int ratio = 40;
+    public static final int CPI = CPR * ratio / wheelSize;
 
-    public DriveTrain(DcMotor fl, DcMotor fr, DcMotor br, DcMotor bl)
+    public DriveTrain(LinearOpMode op)
     {
-        this.fl = fl;
-        this.fr = fr;
-        this.br = br;
-        this.bl = bl;
+        fl = new Motor("fl", op);
+        fr = new Motor("fr", op);
+        br = new Motor("br", op);
+        bl = new Motor("bl", op);
 
-        fl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        fr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        br.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        bl.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        fl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        fr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        br.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        bl.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        fl.setDirection(DcMotor.Direction.REVERSE);
-        bl.setDirection(DcMotor.Direction.REVERSE);
-        fr.setDirection(DcMotor.Direction.FORWARD);
-        br.setDirection(DcMotor.Direction.FORWARD);
-
-        fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        fl.setConstants(DcMotor.RunMode.RUN_WITHOUT_ENCODER, DcMotor.ZeroPowerBehavior.BRAKE, DcMotor.Direction.REVERSE);
+        bl.setConstants(DcMotor.RunMode.RUN_WITHOUT_ENCODER, DcMotor.ZeroPowerBehavior.BRAKE, DcMotor.Direction.REVERSE);
+        fr.setConstants(DcMotor.RunMode.RUN_WITHOUT_ENCODER, DcMotor.ZeroPowerBehavior.BRAKE, DcMotor.Direction.FORWARD);
+        br.setConstants(DcMotor.RunMode.RUN_WITHOUT_ENCODER, DcMotor.ZeroPowerBehavior.BRAKE, DcMotor.Direction.FORWARD);
     }
 
     //One thing to note is this works off a normal trig plane, it is not converted, so 0 is right, not forward.
@@ -79,6 +71,19 @@ public class DriveTrain
         fr.setPower(fr_power);
         bl.setPower(bl_power);
         br.setPower(br_power);
+    }
+
+    public Motor getFL(){
+        return fl;
+    }
+    public Motor getBR(){
+        return br;
+    }
+    public Motor getBL(){
+        return bl;
+    }
+    public Motor getFR(){
+        return fr;
     }
 
 }
